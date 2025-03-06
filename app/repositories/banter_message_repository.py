@@ -50,7 +50,14 @@ class MessageRepository:
         if not db_message:
             return None 
         
-        reactions = json.loads(db_message.reactions) if db_message.reactions else {}
+        
+    # Ensure db_message.reactions is treated correctly
+        try:
+            if isinstance(db_message.reactions, dict):
+                db_message.reactions = json.dumps(db_message.reactions)
+            reactions = json.loads(db_message.reactions) if db_message.reactions else {}
+        except (TypeError, json.JSONDecodeError):
+            reactions = {}
 
         
         if emoji in reactions:
@@ -61,7 +68,7 @@ class MessageRepository:
         
         elif emoji not in reactions:
             reactions[emoji] = [user_reaction] 
-            print(reactions)
+            
         elif user_reaction['uuid'] not in [r['uuid'] for r in reactions[emoji]]:
             reactions[emoji].append(user_reaction)
 
@@ -69,5 +76,7 @@ class MessageRepository:
         db_message.reactions = json.dumps(reactions)
         db.commit()
         db.refresh(db_message)
+        # print(db_message.reactions)
         db_message.reactions = json.loads(db_message.reactions)
+        print(db_message.reactions)
         return db_message

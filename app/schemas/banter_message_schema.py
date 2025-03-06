@@ -13,7 +13,17 @@ class MessageBase(BaseModel):
 
 
 class MessageCreate(MessageBase):
-    pass
+    @classmethod
+    def from_dict(cls, contest_id: str, sender_id: str, data: dict):
+        return cls(
+            contest_id=contest_id,
+            sender_id=sender_id,
+            username=data["username"],
+            text=data["text"],
+            avatar_color_one=data.get("avatarColorOne"),
+            avatar_color_two=data.get("avatarColorTwo"),
+            reply_to=data.get("replyTo"),
+        )
 
 
 class MessageResponse(MessageBase):
