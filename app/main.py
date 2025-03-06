@@ -44,8 +44,8 @@ async def websocket_endpoint(
             data = await websocket.receive_text()
             message_data = json.loads(data)
             
-            if 'text' in message_data:
-                message_create = MessageCreate(
+            
+            message_create = MessageCreate(
                     contest_id=contest_id,
                     sender_id=client_id,
                     username=message_data["username"],
@@ -54,9 +54,9 @@ async def websocket_endpoint(
                     text=message_data["text"],
                     reply_to=message_data.get("replyTo"),
                 )
-                new_message = ChatService.send_message(db, message_create)
-                print(new_message)
-                await manager.broadcast(
+            new_message = ChatService.send_message(db, message_create)
+            print(new_message)
+            await manager.broadcast(
                     contest_id,
                     json.dumps(
                         {
